@@ -11,16 +11,47 @@ dotenv.config();
 
 const app = express();
 
-const allowedOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+const allowedOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+
+function normalizeOrigin(origin) {
+  return String(origin || "").trim().replace(/\/+$/, "");
+}
+
+function parseOriginList(value) {
+  return String(value || "")
+    .split(",")
+    .map((origin) => normalizeOrigin(origin))
+    .filter(Boolean);
+}
+
+const configuredOrigins = new Set([
+  ...parseOriginList(process.env.CORS_ORIGIN),
+  ...parseOriginList(process.env.CORS_ORIGINS),
+]);
+const allowAllOrigins =
+  String(process.env.CORS_ALLOW_ALL || "").toLowerCase() === "true";
+
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOriginPattern.test(origin)) {
+      const normalizedOrigin = normalizeOrigin(origin);
+
+      if (
+        !origin ||
+        allowAllOrigins ||
+        allowedOriginPattern.test(origin) ||
+        configuredOrigins.has(normalizedOrigin)
+      ) {
         return callback(null, true);
       }
-      return callback(new Error("Not allowed by CORS"));
+
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
     },
+    credentials: true,
   }),
 );
 app.use(helmet({ crossOriginResourcePolicy: false }));
