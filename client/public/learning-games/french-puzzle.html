@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>French Puzzle</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Segoe UI, Arial, sans-serif;
+        background:
+          radial-gradient(circle at 12% 0%, rgba(251, 191, 36, 0.16), transparent 34%),
+          radial-gradient(circle at 100% 10%, rgba(245, 158, 11, 0.12), transparent 30%),
+          #07080d;
+        color: #e5e7eb;
+        padding: 12px;
+      }
+
+      .panel {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        background: rgba(14, 16, 24, 0.92);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        padding: 12px;
+      }
+
+      h3 {
+        margin: 0 0 4px;
+        font-size: 18px;
+        color: #fbbf24;
+      }
+
+      p {
+        margin: 4px 0;
+        font-size: 13px;
+        color: #cbd5e1;
+      }
+
+      .section-stats {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .section-pill {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 11px;
+        color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .section-pill.active {
+        border-color: rgba(251, 191, 36, 0.34);
+        background: rgba(251, 191, 36, 0.12);
+        color: #fde68a;
+      }
+
+      .meta-row {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        color: #cbd5e1;
+      }
+
+      .bar {
+        margin-top: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        transition: width 0.3s ease;
+      }
+
+      .hint-line {
+        margin-top: 8px;
+      }
+
+      .hint-line strong {
+        color: #f8fafc;
+      }
+
+      .scramble {
+        margin: 10px 0 8px;
+        font-size: 24px;
+        letter-spacing: 4px;
+        font-weight: 800;
+        color: #f8fafc;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 9px 10px;
+        color: #f8fafc;
+        background: rgba(255, 255, 255, 0.05);
+        font-size: 14px;
+      }
+
+      input:focus {
+        outline: 2px solid rgba(251, 191, 36, 0.35);
+        border-color: rgba(251, 191, 36, 0.5);
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 11px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: all 0.2s ease;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .primary {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #111827;
+      }
+
+      .primary:hover {
+        filter: brightness(1.05);
+      }
+
+      .ghost {
+        background: rgba(255, 255, 255, 0.1);
+        color: #dbeafe;
+      }
+
+      .ghost:hover {
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .meta {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      .msg {
+        min-height: 18px;
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .ok {
+        color: #6ee7b7;
+      }
+
+      .bad {
+        color: #fca5a5;
+      }
+
+      .info {
+        color: #93c5fd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h3>French Word Puzzle Arena</h3>
+      <p>10 challenge words split into 3 sections for stronger recall.</p>
+
+      <div id="sectionStats" class="section-stats"></div>
+
+      <div class="meta-row">
+        <span id="challengeMeta">Challenge 1 / 10</span>
+        <span id="scoreMeta">Solved 0 / 10</span>
+      </div>
+      <div class="bar"><div id="progressBar" class="bar-fill"></div></div>
+
+      <p class="hint-line"><strong>Section:</strong> <span id="sectionLabel"></span></p>
+      <p class="hint-line"><strong>Hint:</strong> <span id="hint"></span></p>
+      <div class="scramble" id="scramble"></div>
+      <input id="answer" placeholder="Type the French word" />
+      <div class="row">
+        <button class="primary" id="check">Check</button>
+        <button class="ghost" id="reveal">Reveal Clue</button>
+        <button class="ghost" id="reshuffle">Reshuffle</button>
+      </div>
+      <p class="meta">Complete all 10 to finish this puzzle mission.</p>
+      <div id="message" class="msg"></div>
+    </div>
+
+    <script>
+      (function () {
+        const puzzleSections = [
+          {
+            name: "Core Basics",
+            challenges: [
+              { french: "bonjour", hint: "Hello" },
+              { french: "merci", hint: "Thank you" },
+              { french: "ecole", hint: "School" },
+              { french: "famille", hint: "Family" },
+            ],
+          },
+          {
+            name: "Food and Travel",
+            challenges: [
+              { french: "fromage", hint: "Cheese" },
+              { french: "pomme", hint: "Apple" },
+              { french: "gare", hint: "Train station" },
+            ],
+          },
+          {
+            name: "Daily Conversation",
+            challenges: [
+              { french: "parler", hint: "To speak" },
+              { french: "lire", hint: "To read" },
+              { french: "travailler", hint: "To work" },
+            ],
+          },
+        ];
+
+        const challenges = puzzleSections.flatMap(function (section, sectionIndex) {
+          return section.challenges.map(function (challenge) {
+            return {
+              french: challenge.french,
+              hint: challenge.hint,
+              section: section.name,
+              sectionIndex: sectionIndex,
+            };
+          });
+        });
+
+        const sectionStatsEl = document.getElementById("sectionStats");
+        const challengeMetaEl = document.getElementById("challengeMeta");
+        const scoreMetaEl = document.getElementById("scoreMeta");
+        const progressBarEl = document.getElementById("progressBar");
+        const sectionLabelEl = document.getElementById("sectionLabel");
+        const hintEl = document.getElementById("hint");
+        const scrambleEl = document.getElementById("scramble");
+        const answerEl = document.getElementById("answer");
+        const msgEl = document.getElementById("message");
+        const checkBtn = document.getElementById("check");
+        const revealBtn = document.getElementById("reveal");
+        const reshuffleBtn = document.getElementById("reshuffle");
+
+        const sectionSolved = puzzleSections.map(function () {
+          return 0;
+        });
+
+        let currentIndex = 0;
+        let solvedCount = 0;
+        let completionSent = false;
+        let currentScramble = "";
+
+        function normalize(value) {
+          return String(value || "").trim().toLowerCase().replace(/\s+/g, "");
+        }
+
+        function getCurrentChallenge() {
+          return challenges[currentIndex] || null;
+        }
+
+        function renderSectionStats() {
+          const current = getCurrentChallenge();
+          sectionStatsEl.innerHTML = puzzleSections
+            .map(function (section, index) {
+              const solved = sectionSolved[index];
+              const total = section.challenges.length;
+              const activeClass = current && current.sectionIndex === index ? " active" : "";
+              return "<span class=\"section-pill" + activeClass + "\">" + section.name + ": " + solved + "/" + total + "</span>";
+            })
+            .join("");
+        }
+
+        function updateProgress() {
+          const total = challenges.length;
+          const step = Math.min(solvedCount, total);
+          challengeMetaEl.textContent = "Challenge " + Math.min(currentIndex + 1, total) + " / " + total;
+          scoreMetaEl.textContent = "Solved " + solvedCount + " / " + total;
+          progressBarEl.style.width = Math.round((step / total) * 100) + "%";
+        }
+
+        function shuffleWord(word) {
+          const original = word.toUpperCase().split("");
+          const chars = original.slice();
+          let attempts = 0;
+
+          do {
+            for (let i = chars.length - 1; i > 0; i -= 1) {
+              const j = Math.floor(Math.random() * (i + 1));
+              const tmp = chars[i];
+              chars[i] = chars[j];
+              chars[j] = tmp;
+            }
+
+            attempts += 1;
+          } while (chars.join("") === original.join("") && attempts < 8);
+
+          if (chars.join("") === original.join("")) {
+            chars.reverse();
+          }
+
+          return chars.join(" ");
+        }
+
+        function sendCompletionIfEligible() {
+          if (completionSent || solvedCount < challenges.length) {
+            return;
+          }
+
+          completionSent = true;
+          window.parent.postMessage(
+            { type: "bonjourbee-mini-game-complete", activity: "puzzle" },
+            window.location.origin,
+          );
+        }
+
+        function renderCurrentChallenge() {
+          const current = getCurrentChallenge();
+
+          updateProgress();
+
+          if (!current) {
+            sectionLabelEl.textContent = "All Sections Complete";
+            hintEl.textContent = "Amazing focus.";
+            scrambleEl.textContent = "MISSION COMPLETE";
+            answerEl.value = "";
+            answerEl.disabled = true;
+            checkBtn.disabled = true;
+            revealBtn.disabled = true;
+            reshuffleBtn.disabled = true;
+            msgEl.textContent = "You solved all 10 challenges. Puzzle badge has been sent.";
+            msgEl.className = "msg ok";
+            renderSectionStats();
+            sendCompletionIfEligible();
+            return;
+          }
+
+          answerEl.disabled = false;
+          checkBtn.disabled = false;
+          revealBtn.disabled = false;
+          reshuffleBtn.disabled = false;
+
+          sectionLabelEl.textContent = current.section;
+          hintEl.textContent = current.hint;
+          currentScramble = shuffleWord(current.french);
+          scrambleEl.textContent = currentScramble;
+          answerEl.value = "";
+          msgEl.textContent = "";
+          msgEl.className = "msg";
+
+          renderSectionStats();
+          answerEl.focus();
+        }
+
+        function checkAnswer() {
+          const current = getCurrentChallenge();
+          if (!current) {
+            return;
+          }
+
+          const guess = normalize(answerEl.value);
+          if (!guess) {
+            msgEl.textContent = "Type your answer first.";
+            msgEl.className = "msg bad";
+            return;
+          }
+
+          if (guess === normalize(current.french)) {
+            solvedCount += 1;
+            sectionSolved[current.sectionIndex] += 1;
+            currentIndex += 1;
+            msgEl.textContent = "Correct. Moving to next challenge.";
+            msgEl.className = "msg ok";
+            renderSectionStats();
+            updateProgress();
+            setTimeout(renderCurrentChallenge, 550);
+            return;
+          }
+
+          msgEl.textContent = "Not correct yet. Try again.";
+          msgEl.className = "msg bad";
+        }
+
+        function revealClue() {
+          const current = getCurrentChallenge();
+          if (!current) {
+            return;
+          }
+
+          const word = current.french;
+          const first = word.charAt(0).toUpperCase();
+          const last = word.charAt(word.length - 1).toUpperCase();
+          msgEl.textContent = "Clue: starts with " + first + ", ends with " + last + ", length " + word.length + ".";
+          msgEl.className = "msg info";
+        }
+
+        function reshuffleCurrent() {
+          const current = getCurrentChallenge();
+          if (!current) {
+            return;
+          }
+
+          currentScramble = shuffleWord(current.french);
+          scrambleEl.textContent = currentScramble;
+          msgEl.textContent = "Letters reshuffled.";
+          msgEl.className = "msg info";
+        }
+
+        checkBtn.addEventListener("click", checkAnswer);
+        revealBtn.addEventListener("click", revealClue);
+        reshuffleBtn.addEventListener("click", reshuffleCurrent);
+
+        answerEl.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            checkAnswer();
+          }
+        });
+
+        renderCurrentChallenge();
+      })();
+    </script>
+  </body>
+</html>

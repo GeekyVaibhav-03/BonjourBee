@@ -1,0 +1,137 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bb-bg: #0a0a0f;
+  --bb-bg-soft: #12121b;
+  --bb-card: rgba(26, 26, 36, 0.8);
+  --bb-border: rgba(255, 255, 255, 0.12);
+  --bb-text: #f8fafc;
+  --bb-muted: #94a3b8;
+  --bb-yellow: #fbbf24;
+  --bb-amber: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
+  color: var(--bb-text);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(251, 191, 36, 0.14), transparent 34%),
+    radial-gradient(circle at 90% 10%, rgba(245, 158, 11, 0.1), transparent 32%),
+    var(--bb-bg);
+}
+
+a {
+  color: inherit;
+}
+
+.bb-card {
+  border: 1px solid var(--bb-border);
+  border-radius: 16px;
+  background: var(--bb-card);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.bb-input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--bb-text);
+  padding: 0.68rem 0.75rem;
+  font-size: 0.94rem;
+}
+
+.bb-input:focus {
+  outline: 2px solid rgba(251, 191, 36, 0.5);
+  border-color: rgba(251, 191, 36, 0.6);
+}
+
+.bb-label {
+  margin-bottom: 0.35rem;
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.bb-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.62rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bb-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bb-btn-primary {
+  color: #111827;
+  background: linear-gradient(135deg, var(--bb-yellow), var(--bb-amber));
+}
+
+.bb-btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.bb-btn-ghost {
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.bb-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bb-section-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .bb-section-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bb-section-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bb-section-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.bb-error {
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  border-radius: 10px;
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+}

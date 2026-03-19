@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>French Quiz</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Segoe UI, Arial, sans-serif;
+        background:
+          radial-gradient(circle at 10% 0%, rgba(251, 191, 36, 0.12), transparent 34%),
+          radial-gradient(circle at 96% 8%, rgba(14, 165, 233, 0.12), transparent 28%),
+          #07080d;
+        color: #e5e7eb;
+        padding: 12px;
+      }
+
+      .panel {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 12px;
+        background: rgba(14, 16, 24, 0.92);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        padding: 12px;
+      }
+
+      h3 {
+        margin: 0 0 8px;
+        color: #fbbf24;
+        font-size: 18px;
+      }
+
+      .intro {
+        margin: 0;
+        color: #cbd5e1;
+        font-size: 13px;
+      }
+
+      .section-stats {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .section-pill {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 11px;
+        color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .section-pill.active {
+        border-color: rgba(56, 189, 248, 0.4);
+        background: rgba(56, 189, 248, 0.12);
+        color: #bae6fd;
+      }
+
+      .meta-row {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        color: #cbd5e1;
+      }
+
+      .bar {
+        margin-top: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        transition: width 0.25s ease;
+      }
+
+      .meta {
+        margin: 10px 0 6px;
+        font-size: 12px;
+        color: #cbd5e1;
+      }
+
+      .question {
+        margin-bottom: 10px;
+        font-weight: 700;
+        color: #f8fafc;
+        font-size: 21px;
+        line-height: 1.25;
+        letter-spacing: 0;
+      }
+
+      .section-line {
+        margin: 0 0 10px;
+        font-size: 13px;
+        color: #cbd5e1;
+      }
+
+      .section-line strong {
+        color: #f8fafc;
+      }
+
+      .option {
+        width: 100%;
+        text-align: left;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        padding: 9px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #f8fafc;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .option:hover {
+        border-color: rgba(251, 191, 36, 0.4);
+        background: rgba(251, 191, 36, 0.12);
+      }
+
+      .option:disabled {
+        opacity: 0.8;
+        cursor: default;
+      }
+
+      .option.correct {
+        border-color: rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.16);
+      }
+
+      .option.incorrect {
+        border-color: rgba(239, 68, 68, 0.45);
+        background: rgba(239, 68, 68, 0.16);
+      }
+
+      .status {
+        min-height: 18px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .ok {
+        color: #6ee7b7;
+      }
+
+      .bad {
+        color: #fca5a5;
+      }
+
+      .info {
+        color: #93c5fd;
+      }
+
+      .footer {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .primary {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #111827;
+      }
+
+      .primary:hover {
+        filter: brightness(1.05);
+      }
+
+      .ghost {
+        background: rgba(255, 255, 255, 0.1);
+        color: #dbeafe;
+      }
+
+      .ghost:hover {
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .results {
+        margin-top: 10px;
+        display: grid;
+        gap: 6px;
+      }
+
+      .result-pill {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 10px;
+        padding: 7px 9px;
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 12px;
+        color: #cbd5e1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h3>Quick French Quiz Lab</h3>
+      <p class="intro">10 sectioned challenges across vocabulary, grammar, and conversation.</p>
+
+      <div id="sectionStats" class="section-stats"></div>
+
+      <div class="meta-row">
+        <span id="meta">Challenge 1 / 10 | Score: 0</span>
+      </div>
+      <div class="bar"><div id="progressBar" class="bar-fill"></div></div>
+
+      <p class="section-line"><strong>Section:</strong> <span id="sectionMeta"></span></p>
+      <div class="question" id="question"></div>
+      <div id="options"></div>
+      <div class="status" id="status"></div>
+      <div class="footer">
+        <button class="btn primary" id="next">Next</button>
+        <button class="btn ghost" id="restart">Restart</button>
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+
+    <script>
+      (function () {
+        const quizSections = [
+          {
+            name: "Vocabulary Core",
+            questions: [
+              {
+                q: "What is the French word for apple?",
+                options: ["Pomme", "Poire", "Orange", "Fraise"],
+                answer: 0,
+              },
+              {
+                q: "How do you say good evening in French?",
+                options: ["Bonjour", "Bonsoir", "Bonne nuit", "Merci"],
+                answer: 1,
+              },
+              {
+                q: "Which French word means red?",
+                options: ["Bleu", "Rouge", "Vert", "Noir"],
+                answer: 1,
+              },
+              {
+                q: "What does bibliotheque mean?",
+                options: ["Bakery", "Hospital", "Library", "Airport"],
+                answer: 2,
+              },
+            ],
+          },
+          {
+            name: "Grammar Builder",
+            questions: [
+              {
+                q: "Complete: Je ___ etudiant.",
+                options: ["vais", "suis", "a", "fais"],
+                answer: 1,
+              },
+              {
+                q: "Complete: Nous ___ au parc.",
+                options: ["allons", "allez", "vais", "va"],
+                answer: 0,
+              },
+              {
+                q: "Complete: Ils ___ francais.",
+                options: ["parlons", "parlez", "parlent", "parle"],
+                answer: 2,
+              },
+            ],
+          },
+          {
+            name: "Conversation Skills",
+            questions: [
+              {
+                q: "How do you ask 'How are you?' in French?",
+                options: ["Ca va ?", "Tu as faim ?", "Ou est la gare ?", "Quel age as-tu ?"],
+                answer: 0,
+              },
+              {
+                q: "Choose the best translation: Thank you very much.",
+                options: ["Merci beaucoup", "Bonjour monsieur", "A bientot", "Bonne chance"],
+                answer: 0,
+              },
+              {
+                q: "Translate: I would like water.",
+                options: ["Je veux du pain", "Je voudrais de l'eau", "Je prends le train", "Je suis fatigue"],
+                answer: 1,
+              },
+            ],
+          },
+        ];
+
+        const questions = quizSections.flatMap(function (section, sectionIndex) {
+          return section.questions.map(function (question) {
+            return {
+              q: question.q,
+              options: question.options,
+              answer: question.answer,
+              section: section.name,
+              sectionIndex: sectionIndex,
+            };
+          });
+        });
+
+        const sectionStatsEl = document.getElementById("sectionStats");
+        const metaEl = document.getElementById("meta");
+        const progressBarEl = document.getElementById("progressBar");
+        const sectionMetaEl = document.getElementById("sectionMeta");
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const statusEl = document.getElementById("status");
+        const nextBtn = document.getElementById("next");
+        const restartBtn = document.getElementById("restart");
+        const resultsEl = document.getElementById("results");
+
+        function newSectionStats() {
+          return quizSections.map(function () {
+            return { attempted: 0, correct: 0 };
+          });
+        }
+
+        let index = 0;
+        let score = 0;
+        let locked = false;
+        let answered = false;
+        let completionSent = false;
+        let sectionStats = newSectionStats();
+
+        function getCurrentQuestion() {
+          return questions[index] || null;
+        }
+
+        function renderSectionStats() {
+          const current = getCurrentQuestion();
+          sectionStatsEl.innerHTML = quizSections
+            .map(function (section, sectionIndex) {
+              const stat = sectionStats[sectionIndex];
+              const total = section.questions.length;
+              const activeClass = current && current.sectionIndex === sectionIndex ? " active" : "";
+              return "<span class=\"section-pill" + activeClass + "\">" + section.name + ": " + stat.correct + "/" + total + "</span>";
+            })
+            .join("");
+        }
+
+        function updateMeta() {
+          const total = questions.length;
+          const currentStep = Math.min(index + (answered ? 1 : 0), total);
+          metaEl.textContent = "Challenge " + Math.min(index + 1, total) + " / " + total + " | Score: " + score;
+          progressBarEl.style.width = Math.round((currentStep / total) * 100) + "%";
+        }
+
+        function renderQuestion() {
+          const item = getCurrentQuestion();
+          if (!item) {
+            renderFinalState();
+            return;
+          }
+
+          sectionMetaEl.textContent = item.section;
+          resultsEl.innerHTML = "";
+          questionEl.textContent = item.q;
+          statusEl.textContent = "";
+          statusEl.className = "status";
+          optionsEl.innerHTML = "";
+          locked = false;
+          answered = false;
+
+          renderSectionStats();
+          updateMeta();
+
+          item.options.forEach(function (opt, i) {
+            const btn = document.createElement("button");
+            btn.className = "option";
+            btn.textContent = opt;
+            btn.addEventListener("click", function () {
+              if (locked) {
+                return;
+              }
+
+              answered = true;
+              locked = true;
+              const current = getCurrentQuestion();
+              const sectionStat = sectionStats[current.sectionIndex];
+              sectionStat.attempted += 1;
+
+              const buttons = optionsEl.querySelectorAll("button.option");
+              buttons.forEach(function (optionButton, optionIndex) {
+                optionButton.disabled = true;
+                if (optionIndex === current.answer) {
+                  optionButton.classList.add("correct");
+                }
+              });
+
+              if (i === current.answer) {
+                score += 1;
+                sectionStat.correct += 1;
+                statusEl.textContent = "Correct answer.";
+                statusEl.className = "status ok";
+              } else {
+                buttons[i].classList.add("incorrect");
+                statusEl.textContent = "Not quite. Correct: " + current.options[current.answer];
+                statusEl.className = "status bad";
+              }
+
+              renderSectionStats();
+              updateMeta();
+            });
+            optionsEl.appendChild(btn);
+          });
+        }
+
+        function notifyQuizCompletion() {
+          if (completionSent) {
+            return;
+          }
+
+          completionSent = true;
+          window.parent.postMessage(
+            { type: "bonjourbee-mini-game-complete", activity: "quiz" },
+            window.location.origin,
+          );
+        }
+
+        function renderFinalState() {
+          sectionMetaEl.textContent = "All Sections Complete";
+          questionEl.textContent = "Quiz complete. Final score: " + score + " / " + questions.length;
+          optionsEl.innerHTML = "";
+          statusEl.textContent = "Great work. Your quiz activity was marked complete.";
+          statusEl.className = "status ok";
+          progressBarEl.style.width = "100%";
+          renderSectionStats();
+
+          resultsEl.innerHTML = quizSections
+            .map(function (section, sectionIndex) {
+              const stat = sectionStats[sectionIndex];
+              return "<div class=\"result-pill\">" + section.name + ": " + stat.correct + " / " + section.questions.length + " correct</div>";
+            })
+            .join("");
+
+          notifyQuizCompletion();
+        }
+
+        function nextQuestion() {
+          if (!answered && index < questions.length) {
+            statusEl.textContent = "Choose an option before moving on.";
+            statusEl.className = "status info";
+            return;
+          }
+
+          if (index < questions.length - 1) {
+            index += 1;
+            renderQuestion();
+            return;
+          }
+
+          index = questions.length;
+          renderFinalState();
+        }
+
+        function restartQuiz() {
+          index = 0;
+          score = 0;
+          completionSent = false;
+          sectionStats = newSectionStats();
+          renderQuestion();
+        }
+
+        nextBtn.addEventListener("click", nextQuestion);
+        restartBtn.addEventListener("click", restartQuiz);
+        renderQuestion();
+      })();
+    </script>
+  </body>
+</html>
